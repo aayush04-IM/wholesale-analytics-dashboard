@@ -1,0 +1,15 @@
+import streamlit as st
+import plotly.express as px
+from dashboard import load_data
+
+st.title("⭐ Product Ratings")
+
+query = "SELECT * FROM view_product_ratings;"
+df = load_data(query)
+
+df.columns = [col.replace("_", " ").title() for col in df.columns]
+
+st.dataframe(df, use_container_width=True)
+
+fig = px.box(df, x="Product Name", y="Rating", color="Product Name", title="Product Rating Distribution")
+st.plotly_chart(fig, use_container_width=True)
