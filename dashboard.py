@@ -1,34 +1,24 @@
+# dashboard.py (main file)
+
 import streamlit as st
 import psycopg2
 import pandas as pd
 
-st.set_page_config(page_title="Mega Wholesale Dashboard", layout="wide")
+st.set_page_config(page_title="📊 Mega Wholesale Dashboard", layout="wide")
 
-st.title("📦 Mega Wholesale Dashboard")
-st.subheader("📊 Stock Availability Across 20 Cities")
+st.title("📊 Mega Wholesale Dashboard")
+st.markdown("Welcome to your central analytics hub for your 20-city wholesale business.")
 
-# 🔐 Use Render secret environment variables (set these in Render settings)
-db_host = st.secrets["DB_HOST"]
-db_name = st.secrets["DB_NAME"]
-db_user = st.secrets["DB_USER"]
-db_pass = st.secrets["DB_PASSWORD"]
-db_port = st.secrets["DB_PORT"]
+@st.cache_resource
+def get_connection():
+    return psycopg2.connect(
+        host=st.secrets["DB_HOST"],
+        dbname=st.secrets["DB_NAME"],
+        user=st.secrets["DB_USER"],
+        password=st.secrets["DB_PASSWORD"],
+        port=st.secrets["DB_PORT"]
+    )
 
-# 🔌 Connect to Supabase
-conn = psycopg2.connect(
-    host=db_host,
-    dbname=db_name,
-    user=db_user,
-    password=db_pass,
-    port=db_port
-)
-
-# 🧠 SQL Query from your view
-query = "SELECT * FROM view_stock_availability;"
-df = pd.read_sql(query, conn)
-
-# 📊 Show data
-st.dataframe(df)
-
-# ✅ Clean up
-conn.close()
+def load_data(query):
+    conn = get_connection()
+    return pd.read_sql(query, conn)
